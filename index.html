@@ -23,7 +23,7 @@
 <body>
 
   <h1>録音付きストップウォッチ</h1>
-  <div id="timer">0.0 秒</div>
+  <div id="timer">00:00.0</div>
 
   <button id="startBtn">🎙️ スタート</button>
   <button id="stopBtn" disabled>🛑 ストップ</button>
@@ -46,13 +46,21 @@
     const audioPlayer = document.getElementById('audioPlayer');
     const timerDisplay = document.getElementById('timer');
 
+    // タイマー表示を mm:ss.d に変換
+    function formatTime(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      const dec = Math.floor((seconds - Math.floor(seconds)) * 10);
+      return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${dec}`;
+    }
+
     // スタート
     startBtn.onclick = async () => {
       count = 0;
-      timerDisplay.textContent = "0.0 秒";
+      timerDisplay.textContent = formatTime(0);
       timer = setInterval(() => {
         count += 0.1;
-        timerDisplay.textContent = count.toFixed(1) + " 秒";
+        timerDisplay.textContent = formatTime(count);
       }, 100);
 
       recordedChunks = [];
@@ -72,7 +80,6 @@
 
       mediaRecorder.start();
 
-      // ボタン状態
       startBtn.disabled = true;
       stopBtn.disabled = false;
       resetBtn.disabled = true;
@@ -84,7 +91,6 @@
       clearInterval(timer);
       mediaRecorder.stop();
 
-      // ボタン状態
       startBtn.disabled = false;
       stopBtn.disabled = true;
       resetBtn.disabled = false;
@@ -94,14 +100,12 @@
     resetBtn.onclick = () => {
       clearInterval(timer);
       count = 0;
-      timerDisplay.textContent = "0.0 秒";
+      timerDisplay.textContent = formatTime(0);
 
-      // 録音データ削除
       recordedChunks = [];
       audioPlayer.removeAttribute("src");
-      audioPlayer.load(); // リセット
+      audioPlayer.load();
 
-      // ボタン状態
       startBtn.disabled = false;
       stopBtn.disabled = true;
       resetBtn.disabled = true;
